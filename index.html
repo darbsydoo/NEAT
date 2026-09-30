@@ -97,8 +97,16 @@
   .stage {
     width: 100%;
     max-width: 420px;
+    /* 9-30 ver3: 100vh alone overshoots the visible screen in the iPhone
+       home-screen app (it counts the status-bar area too), and with the
+       stage centred that pushed the top rows (name, sliders) off screen.
+       100dvh is the actually visible height; 100vh stays as the fallback
+       for older browsers. Safe-area padding keeps content clear of notches. */
     height: 100vh;
+    height: 100dvh;
     max-height: 860px;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px) !important;
     display: flex;
     flex-direction: column;
     /* No top padding: the swipe hint sits right up against the top edge,
@@ -3825,6 +3833,12 @@
   // because the field can be panned, widened and rotated far enough that any
   // per-card bounding box eventually runs out of stars and leaves blank sky.
   // =========================================================================
+  // 9-30 ver3: Chinese names on/off. The user's own copy keeps them; the
+  // GitHub (index.html) build sets this to false, which strips them before
+  // anything is drawn (card title, name reveal, pinyin).
+  const SHOW_CHINESE = false;
+  if (!SHOW_CHINESE) CONSTELLATIONS.forEach(c => { delete c.chineseName; delete c.pinyin; delete c.chineseMeaning; });
+
   const SKY_CATALOG = [
     {ra:1.334,dec:-5.708,mag:4.61,bv:0.89},{ra:2.097,dec:29.091,mag:2.06,bv:-0.06},{ra:2.295,dec:59.15,mag:2.27,bv:0.356},{ra:2.353,dec:-45.748,mag:3.88,bv:0.89},
     {ra:2.816,dec:-15.468,mag:4.89,bv:0.496},{ra:3.309,dec:15.184,mag:2.83,bv:-0.24},{ra:3.651,dec:20.207,mag:4.8,bv:1.56},{ra:3.66,dec:-18.933,mag:4.44,bv:1.6},
