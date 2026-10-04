@@ -3193,7 +3193,11 @@
       // while name keeps the catalog form, same split as theta Piscium.
       neighbors: [
         { name: "δ Boötis", ra: 228.876, dec: 33.315, mag: 3.48, bv: 0.951, target: false },
-        { name: "T Coronae Borealis", ra: 239.876, dec: 25.920, mag: 2.0, bv: -0.15, target: false, dist: 3000, type: "M III", mass: 1, displayName: "Blaze Star", notable: "The Blaze Star — a recurrent nova, only visible briefly every 80 years, when it flares to magnitude 2. A white dwarf pulls hydrogen off its red giant companion until the pileup ignites in a thermonuclear flash on the dwarf's surface." },
+        // 9-30 ver5: mag 4.9 is INTENTIONALLY wrong. Normally ~10 (invisible);
+        // it flares to ~2 about every 80 years. 2.0 was too bright and didn't
+        // match what you'd actually see; 4.9 keeps it on the card, just above
+        // the 5.1 slider limit.
+        { name: "T Coronae Borealis", ra: 239.876, dec: 25.920, mag: 4.9, bv: -0.15, target: false, dist: 3000, type: "M III", mass: 1, displayName: "Blaze Star", notable: "The Blaze Star — a recurrent nova, only visible briefly every 80 years, when it flares to magnitude 2. A white dwarf pulls hydrogen off its red giant companion until the pileup ignites in a thermonuclear flash on the dwarf's surface." },
         // Hercules (added stage 30) borders to the east.
         { name: "Kornephoros", ra: 247.555, dec: 21.490, mag: 2.77, bv: 0.91, target: false },
         { name: "ζ Herculis",  ra: 250.322, dec: 31.603, mag: 2.81, bv: 0.65, target: false }
@@ -3837,9 +3841,12 @@
   // 9-30 ver3: Chinese names on/off. The user's own copy keeps them; the
   // GitHub (index.html) build sets this to false, which strips them before
   // anything is drawn (card title, name reveal, pinyin).
-  const SHOW_CHINESE = false;
+  const SHOW_CHINESE = false;   // 9-30 ver7: off in every copy for now (user)
   if (!SHOW_CHINESE) CONSTELLATIONS.forEach(c => { delete c.chineseName; delete c.pinyin; delete c.chineseMeaning; });
 
+  // 9-30 ver6: T Coronae Borealis (the Blaze Star, ra 239.876) is set to
+  // mag 4.9 here too, intentionally wrong to match the CrB card (BSC lists
+  // its 1946 outburst value, 2.0; it is normally ~10).
   const SKY_CATALOG = [
     {ra:1.334,dec:-5.708,mag:4.61,bv:0.89},{ra:2.097,dec:29.091,mag:2.06,bv:-0.06},{ra:2.295,dec:59.15,mag:2.27,bv:0.356},{ra:2.353,dec:-45.748,mag:3.88,bv:0.89},
     {ra:2.816,dec:-15.468,mag:4.89,bv:0.496},{ra:3.309,dec:15.184,mag:2.83,bv:-0.24},{ra:3.651,dec:20.207,mag:4.8,bv:1.56},{ra:3.66,dec:-18.933,mag:4.44,bv:1.6},
@@ -4110,7 +4117,7 @@
     {ra:238.785,dec:-63.431,mag:2.85,bv:0.356},{ra:237.816,dec:20.978,mag:4.76,bv:1.185},{ra:237.808,dec:35.657,mag:4.82,bv:0.869},{ra:236.015,dec:77.794,mag:4.32,bv:0.09},
     {ra:238.403,dec:-25.327,mag:4.59,bv:-0.225},{ra:238.456,dec:-16.729,mag:4.15,bv:0.856},{ra:238.169,dec:42.452,mag:4.62,bv:0.524},{ra:239.221,dec:-29.214,mag:3.88,bv:-0.24},
     {ra:239.113,dec:15.662,mag:3.85,bv:0.468},{ra:239.548,dec:-14.279,mag:4.88,bv:-0.15},{ra:239.876,dec:-41.744,mag:4.99,bv:0.89},{ra:239.713,dec:-26.114,mag:2.89,bv:-0.27},
-    {ra:239.397,dec:26.878,mag:4.15,bv:1.008},{ra:240.03,dec:-38.397,mag:3.41,bv:-0.225},{ra:240.083,dec:-22.622,mag:2.32,bv:-0.291},{ra:239.876,dec:25.92,mag:2,bv:-0.15},
+    {ra:239.397,dec:26.878,mag:4.15,bv:1.008},{ra:240.03,dec:-38.397,mag:3.41,bv:-0.225},{ra:240.083,dec:-22.622,mag:2.32,bv:-0.291},{ra:239.876,dec:25.92,mag:4.9,bv:-0.15},
     {ra:239.447,dec:54.75,mag:4.95,bv:0.3},{ra:240.883,dec:-57.775,mag:4.63,bv:0.21},{ra:240.804,dec:-49.23,mag:4.65,bv:0.844},{ra:240.851,dec:-38.602,mag:4.89,bv:-0.12},
     {ra:240.836,dec:-25.865,mag:5,bv:1.185},{ra:240.361,dec:29.851,mag:4.99,bv:0},{ra:240.574,dec:22.804,mag:4.83,bv:0.09},{ra:241.092,dec:-11.373,mag:4.77,bv:0.44},
     {ra:241.623,dec:-45.173,mag:4.72,bv:0.15},{ra:240.7,dec:46.037,mag:4.76,bv:-0.03},{ra:241.359,dec:-19.806,mag:2.62,bv:-0.27},{ra:241.36,dec:-19.802,mag:4.92,bv:-0.24},
@@ -5059,6 +5066,9 @@
         if (isNamed(s)) return;
         adjacentStars.push({
           name: s.name, ra: s.ra, dec: s.dec, mag: s.mag, bv: s.bv,
+          // 9-30 ver5: carry the full data so a tap shows the same box as on
+          // the star's home card (distance, type, mass and note).
+          dist: s.dist, type: s.type, mass: s.mass, notable: s.notable,
           target: false, adjacentTo: other.name, jitter: makeJitter(rnd)
         });
       });
@@ -5091,6 +5101,8 @@
             s.adjacentTo = other.name;
             if (s.dist === undefined && match.dist !== undefined) s.dist = match.dist;
             if (s.type === undefined && match.type !== undefined) s.type = match.type;
+            if (s.mass === undefined && match.mass !== undefined) s.mass = match.mass;
+            if (s.notable === undefined && match.notable !== undefined) s.notable = match.notable;
             break;
           }
         }
@@ -5477,12 +5489,40 @@
   // as present rather than as almost nothing, and everything above it moves
   // up with it.
   const FULL_BRIGHT_SPAN = 6.0;  // 9-30 ver4 (brightness tuner; was 3.0)
-  const FAINT_ALPHA = 0.09;      // 9-30 ver4 (brightness tuner; was 0.3)
+  // 9-30 ver5 brightness settings (user, tuned in bright indoor light; they
+  // don't work well in outdoor daylight — the screen can't show faint stars
+  // there — so the deck is meant for indoor use or at night).
+  const FAINT_ALPHA = 0.53;      // was 0.09 (ver4), 0.3 before that
   const VISIBILITY_BONUS = 0.5;
   function alphaForMag(mag) {
+    return alphaForMagCore(mag) * limitFade(mag);
+  }
+  function alphaForMagCore(mag) {
     const above = (limitMag - mag) + VISIBILITY_BONUS;
     const t = Math.min(1, Math.max(0, above / FULL_BRIGHT_SPAN));
-    return FAINT_ALPHA + (1 - FAINT_ALPHA) * t;
+    const base = FAINT_ALPHA + (1 - FAINT_ALPHA) * t;
+    // Band lift (9-30 ver5): extra brightness for the 3rd-magnitude stars so
+    // they separate from the 4s. Strongest at BAND_PEAK, gone BAND_FAINT
+    // mags fainter and BAND_BRIGHT mags brighter (absolute magnitudes), and
+    // capped so a lifted star never outshines the unlifted stars just
+    // brighter than the band.
+    let w = 0;
+    if (mag >= BAND_PEAK) w = Math.max(0, 1 - (mag - BAND_PEAK) / BAND_FAINT);
+    else w = Math.max(0, 1 - (BAND_PEAK - mag) / BAND_BRIGHT);
+    if (w <= 0) return base;
+    const edgeMag = BAND_PEAK - BAND_BRIGHT;
+    const tEdge = Math.min(1, Math.max(0, ((limitMag - edgeMag) + VISIBILITY_BONUS) / FULL_BRIGHT_SPAN));
+    const cap = FAINT_ALPHA + (1 - FAINT_ALPHA) * tEdge;
+    return Math.min(Math.max(base, cap), base + BAND_LIFT * w * (1 - base));
+  }
+  const BAND_LIFT = 0.30, BAND_PEAK = 3.0, BAND_FAINT = 1.0, BAND_BRIGHT = 1.1;
+  // Limit fade (9-30 ver5): stars within LIMIT_FADE mags of the magnitude
+  // limit dim smoothly (smoothstep) to LIMIT_FLOOR of their brightness at the
+  // limit, instead of popping on and off as the slider passes them.
+  const LIMIT_FADE = 1.2, LIMIT_FLOOR = 0.15;
+  function limitFade(mag) {
+    const h = Math.min(1, Math.max(0, (limitMag - mag) / LIMIT_FADE));
+    return LIMIT_FLOOR + (1 - LIMIT_FLOOR) * h * h * (3 - 2 * h);
   }
 
   const SPIKE_THRESHOLD = 1.8;
@@ -5994,6 +6034,44 @@
       ctx.restore();
     }
 
+    // Neighbouring constellations (9-30 ver5): drawn with the same red lines
+    // as the card's own figure, one at a time and cumulative, so each new one
+    // joins those already shown. Reveal-more: up to the neighbour being named;
+    // once the sequence has finished, all the visible neighbours. Slideshow:
+    // up to the one taking its turn.
+    let nbShown = [];
+    if (slideshow) {
+      if (slideStepId() === 'neighbours' && slideNeighbourList.length) {
+        const i = Math.min(slideNeighbourList.length - 1, Math.floor(slideElapsed / NEIGHBOUR_INTERVAL));
+        nbShown = slideNeighbourList.slice(0, i + 1);
+      }
+    } else if (moreSeq) {
+      if (moreSeq.phase === 'neighbours') nbShown = moreSeq.neighbours.slice(0, moreSeq.i + 1);
+    } else if (revealLevel >= 2) {
+      nbShown = visibleNeighbours();
+    }
+    if (nbShown.length) {
+      const at = {};
+      drawn.forEach(({ star, pos }) => { if (star.name && star.adjacentTo) at[star.adjacentTo + '|' + star.name] = pos; });
+      ctx.save();
+      ctx.strokeStyle = `rgba(${revealColor},0.55)`;
+      ctx.lineWidth = 1.6;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      nbShown.forEach(nbName => {
+        const other = CONSTELLATIONS.find(c => c.name === nbName);
+        if (!other || !other.lines) return;
+        other.lines.forEach(([a, b]) => {
+          const pa = at[nbName + '|' + a], pb = at[nbName + '|' + b];
+          if (!pa || !pb) return;
+          ctx.moveTo(pa.x, pa.y);
+          ctx.lineTo(pb.x, pb.y);
+        });
+      });
+      ctx.stroke();
+      ctx.restore();
+    }
+
     // Plain first-press "reveal" (not yet "reveal more") flashes the figure
     // stars instead of lighting them solid: 1s on, 2s off, reverting to the
     // star's true colour/size while off so the eye can compare the
@@ -6034,8 +6112,10 @@
       // During the slideshow only the constellation taking its turn lights up.
       const nFocus = slideshow ? slideNeighbourFocus() : moreNeighbourFocus();
       const gated = slideshow || !!moreSeq;
-      const useAdjacent = star.adjacentTo && revealLevel >= 2 &&
-                          (!gated || (nFocus && star.adjacentTo === nFocus));
+      // 9-30 ver5: neighbouring constellations are shown as line drawings
+      // (see drawNeighbourLines), not magenta stars; their stars keep their
+      // own colour and twinkle.
+      const useAdjacent = false;
       const isSelected = star === selectedStar;
       // A ringed star always shows its own colour and size (and twinkles).
       const isRing = isSelected || flashTarget || (slideFocus && slideFocus === star);
