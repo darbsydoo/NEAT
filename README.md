@@ -6,7 +6,7 @@ A magnitude slider sets how many stars you see, from a city sky to a dark rural 
 
 Special stars adds short guided tours: finding your way from the Big Dipper and Orion, the nearest bright stars, the life of a star, and what a star's colour tells you.
 
-It's a learning tool, not a stargazing app. For finding stars under the night sky, an app like SkyView is better.
+It's a learning tool, not a stargazing app. For finding stars under the night sky, an app like Star Walk 2 is better.
 
 Open it: https://darbsydoo.github.io/NEAT/
 

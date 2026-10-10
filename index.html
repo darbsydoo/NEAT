@@ -230,6 +230,18 @@
     font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; padding: 10px 8px; white-space: nowrap; }
   #infoPanel.tour { width: 77%; max-width: 300px; }
   #infoPanel.mid { top: 38%; bottom: auto; }
+  /* The color code: the type letters in order, each in its own color, just above the buttons. */
+  #tourStrip { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 62px);
+    padding: 5px 14px 6px; background: rgba(10,13,24,0.9); border: 1px solid var(--card-edge); border-radius: 10px; pointer-events: none; }
+  #tourStrip[hidden] { display: none; }
+  .ts-top { display: flex; align-items: center; gap: 8px; color: var(--chrome); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .ts-top i { flex: 1 1 auto; height: 1px; background: var(--chrome-dim); position: relative; }
+  .ts-top i::before { content: ''; position: absolute; left: -1px; top: -3px; border: solid var(--chrome-dim); border-width: 0 0 1px 1px; width: 6px; height: 6px; transform: rotate(45deg); }
+  .ts-top i::after { content: ''; position: absolute; right: -1px; top: -3px; border: solid var(--chrome-dim); border-width: 1px 1px 0 0; width: 6px; height: 6px; transform: rotate(45deg); }
+  .ts-letters { display: flex; gap: 15px; margin-top: 2px; font-size: 19px; font-weight: 700; line-height: 1.25; }
+  .ts-letters span { opacity: 0.62; border-bottom: 2px solid transparent; }
+  .ts-letters span.on { opacity: 1; border-bottom-color: currentColor; }
+  #infoPanel.low.over-strip { bottom: calc(env(safe-area-inset-bottom, 0px) + 124px); }
   .ip-dist { margin-top: 1px; font-size: 13px; color: var(--chrome); letter-spacing: 0.04em; }
   .ip-dist b { font-size: 26px; font-weight: 700; color: #fff; letter-spacing: 0; margin-right: 5px; }
   .ip-dist.ip-stage b { font-size: 21px; letter-spacing: 0.01em; margin-right: 7px; }
@@ -346,6 +358,7 @@
     <div id="colValues"></div>
   </div>
   <div id="bigName"></div>
+  <div id="tourStrip" hidden><div class="ts-top"><span>hotter</span><i></i><span>cooler</span></div><div class="ts-letters" id="tourStripLetters"></div></div>
   <div id="infoPanel">
     <button id="infoClose" aria-label="close">&times;</button>
     <div id="infoBody"></div>
@@ -405,7 +418,7 @@
     <div class="gp-body" id="guideBody">
         <div class="gp-sec" data-sec="use">
           <p>NEAT trains you to recognize constellations as they are likely to appear under your own viewing conditions. Playing with the magnitude slider while you look at the stars is a critical part of this: it simulates how the sky looks under different levels of light pollution, and lets you practice under your normal viewing conditions.</p>
-          <p>This is not a program to hold up while looking at the night sky; for that there are good programs like SkyView. NEAT is a training program for when you are back home under a roof and want to practice, so that out under the sky you can recognize the constellations and know the stars on your own.</p>
+          <p>This is not a program to hold up while looking at the night sky; for that there are good programs like Star Walk 2. NEAT is a training program for when you are back home under a roof and want to practice, so that out under the sky you can recognize the constellations and know the stars on your own.</p>
           <h3>Getting started</h3>
           <p><span class="mini-btn">star choice</span> picks which constellations to practice. Choose a group; its constellations turn gold in the list. When you are just starting, it is best to choose a group with fewer constellations, or constellations you already recognize.</p>
           <p>At the bottom of the <span class="cmd">star choice</span> list, <span class="cmd">Special stars</span> opens guided tours: sets of stars with something in common, shown one at a time with a short explanation. Press <span class="cmd">next</span> to move on.</p>
@@ -4521,8 +4534,8 @@
         kind: "emission nebula", dist: 7500,
         notable: "Star-forming cloud holding Eta Carinae, a pair of stars of 100 and 30\u201380 M\u2609 shining 5,000,000 times brighter than the Sun. In 1843 it erupted, threw off 20 M\u2609 of gas and briefly became the second-brightest star. It is expected to go supernova." },
       // Gamma Velorum: named and tappable, but in no figure and not in Carina's reveal (not in labels).
-      { name: "Suhail al Muhlif", ra: 122.383, dec: -47.337, mag: 1.78, bv: -0.31, target: false, con: "Vela", dist: 1100, type: "WC8 + O7.5 III", mass: 30,
-        notable: "Holds the nearest and brightest Wolf-Rayet star: a 9 M\u2609 stripped core that began at 35 M\u2609 and blew the rest away. It orbits an O-class giant of 30 M\u2609 every 78 days. Both will likely end as supernovae." }
+      { name: "Suhail al Muhlif", ra: 122.383, dec: -47.337, mag: 1.78, bv: -0.31, target: false, con: "Vela", dist: 1100, type: "O7.5 III", mass: 30,
+        notable: "Holds the nearest and brightest Wolf-Rayet star: a very heavy star late in life whose own fierce wind has blown away its outer hydrogen, baring the hot core beneath. This one began at 35 M\u2609 and is down to 9. It circles a 30 M\u2609 O-class giant every 78 days." }
     ],
     labels: ["Canopus", "Carina Nebula"]
   });
@@ -4551,11 +4564,70 @@
     labels: ["Algorab"]
   });
   { const g = DECK_GROUPS.find(x => x.name === "Leo & friends"); if (g && !g.ids.includes("corvus")) g.ids.push("corvus"); }   // beside Virgo, a spring figure
+  // Libra (10-10 ver 8). 4 stars, 3 lines, from the user's reference app, in his drawing order:
+  // Zubenelhakrabi - Zubeneschamali - Zubenelgenubi - Brachium. Catalogue positions; types, distances and
+  // masses from Wikipedia (the Libra star list and each star's article), rounded; where two sources
+  // differ a middle value is used.
+  CONSTELLATIONS.push({
+    id: "libra",
+    name: "Libra",
+    centroidRA: 227.97,
+    centroidDec: -16.37,
+    target: [
+      { name: "Zubeneschamali", ra: 229.252, dec: -9.383, mag: 2.61, bv: -0.06, target: true, dist: 185, type: "B8 V", mass: 3.5, notable: "Earlier observers often called it the only green star visible to the naked eye. Modern observers see white or pale blue, as its 11,900 K surface should look, and there is no accepted explanation for the green reports. By the physics of glowing bodies, no star can look green." },
+      { name: "Zubenelgenubi", ra: 222.720, dec: -16.042, mag: 2.75, bv: 0.09, target: true, dist: 77, type: "A3 IV", mass: 2 },
+      { name: "Brachium", ra: 226.017, dec: -25.282, mag: 3.29, bv: 1.6, target: true, dist: 280, type: "M3 III", mass: 2 },
+      { name: "Zubenelhakrabi", ra: 233.882, dec: -14.789, mag: 3.91, bv: 0.856, target: true, dist: 160, type: "G8 III", mass: 1 }
+    ],
+    lines: [
+      ["Zubenelhakrabi", "Zubeneschamali"],
+      ["Zubeneschamali", "Zubenelgenubi"],
+      ["Zubenelgenubi", "Brachium"]
+    ],
+    labels: ["Zubeneschamali"]
+  });
+  // Libra sits between Virgo and Scorpius, so it is in both of their groups (user, 10-10).
+  for (const gn of ["Scorpius & friends", "Leo & friends"]) { const g = DECK_GROUPS.find(x => x.name === gn); if (g && !g.ids.includes("libra")) g.ids.push("libra"); }
+  // Vela (10-10 ver 9). 9 stars, 9 lines: a closed loop in the user's drawing order from his reference
+  // app: Suhail - psi - q - p - mu - phi - Markeb - Alsephina - Suhail al Muhlif - back to Suhail.
+  // (His app labels q and p Velorum by their Hipparcos numbers, HIP 50191 and HIP 51986.)
+  // Catalogue positions; types, distances and masses from Wikipedia (the Vela star list and each star's
+  // article), middle values where sources differ. Gamma Velorum (Suhail al Muhlif) is a figure star here;
+  // its older entry among Carina's neighbours is now ignored.
+  CONSTELLATIONS.push({
+    id: "vela",
+    name: "Vela",
+    centroidRA: 144.19,
+    centroidDec: -48.37,
+    target: [
+      { name: "Suhail al Muhlif", ra: 122.383, dec: -47.337, mag: 1.78, bv: -0.31, target: true, dist: 1100, type: "O7.5 III", mass: 30, notable: "Holds the nearest and brightest Wolf-Rayet star: a very heavy star late in life whose own fierce wind has blown away its outer hydrogen, baring the hot core beneath. This one began at 35 M\u2609 and is down to 9. It circles a 30 M\u2609 O-class giant every 78 days." },
+      { name: "Alsephina", ra: 131.176, dec: -54.708, mag: 1.96, bv: 0.03, target: true, dist: 81, type: "A1 V", mass: 2.4 },
+      { name: "Suhail", ra: 136.999, dec: -43.432, mag: 2.21, bv: 1.156, target: true, dist: 560, type: "K4 Ib", mass: 7, notable: "Only 32 million years old and already an orange supergiant 210 times the Sun's width. At 7 M\u2609 it sits on the borderline between two endings: a quiet fade to a white dwarf, or a supernova that leaves a neutron star." },
+      { name: "Markeb", ra: 140.528, dec: -55.011, mag: 2.5, bv: -0.24, target: true, dist: 550, type: "B2 IV", mass: 13, notable: "With Alsephina and two stars of Carina, Avior and Aspidiske, it forms the False Cross: a diamond a little larger and dimmer than the Southern Cross, and mistaken for it often enough to have thrown off navigators." },
+      { name: "μ Velorum", ra: 161.692, dec: -49.420, mag: 2.69, bv: 0.775, target: true, dist: 116, type: "G5 III", mass: 3.3 },
+      { name: "φ Velorum", ra: 149.216, dec: -54.568, mag: 3.54, bv: -0.15, target: true, dist: 1800, type: "B5 Ib", mass: 10 },
+      { name: "ψ Velorum", ra: 142.675, dec: -40.467, mag: 3.6, bv: 0.384, target: true, dist: 61, type: "F0 IV", mass: 1.5 },
+      { name: "p Velorum", ra: 159.325, dec: -48.226, mag: 3.84, bv: 0.412, target: true, dist: 87, type: "F3 IV", mass: 1.9 },
+      { name: "q Velorum", ra: 153.684, dec: -42.122, mag: 3.85, bv: 0.06, target: true, dist: 103, type: "A2 V" }
+    ],
+    lines: [
+      ["Suhail", "ψ Velorum"],
+      ["ψ Velorum", "q Velorum"],
+      ["q Velorum", "p Velorum"],
+      ["p Velorum", "μ Velorum"],
+      ["μ Velorum", "φ Velorum"],
+      ["φ Velorum", "Markeb"],
+      ["Markeb", "Alsephina"],
+      ["Alsephina", "Suhail al Muhlif"],
+      ["Suhail al Muhlif", "Suhail"]
+    ],
+    labels: ["Suhail al Muhlif", "Suhail", "Markeb"]
+  });
   // Zodiac group removed (user, 10-09): with no planets or Moon in the program it teaches nothing here,
   // its members are all in the seasonal groups, and it crowded the special stars row. The copied
   // DECK_GROUPS block is left as it is; the group is taken out of the list here.
   { const zi = DECK_GROUPS.findIndex(g => g.name === "Zodiac"); if (zi >= 0) DECK_GROUPS.splice(zi, 1); }
-  DECK_GROUPS.push({ name: "Southern sky", ids: ["crux", "centaurus", "carina"] });
+  DECK_GROUPS.push({ name: "Southern sky", ids: ["crux", "centaurus", "carina", "vela"] });
   // Bright stars in no figure (10-08 ver 21): every star of magnitude 2.0 or brighter now has a name,
   // type, distance and mass. Positions, magnitudes and B-V from the catalogue rows (Alnair and Diphda
   // from their existing neighbour entries, which these replace as the richer entry). Type, distance
@@ -4640,7 +4712,7 @@
       ] },
     // The color code (10-09): one star per type letter, hottest first; the texts build from color
     // (blackbody radiation) to luminosity = width squared x temperature to the fourth, to apparent brightness.
-    { id: "color", name: "The color code", note: "Seven stars from O to M: what color, temperature and brightness tell you.", headColor: true,
+    { id: "color", name: "The color code", note: "Seven stars from O to M: what color, temperature and brightness tell you.", headColor: true, strip: true, fill: 0.30,
       stops: [
         { star: "Alnitak", head: "O \u00b7 29,500 K", text: "Anything hot and dense glows, and its temperature alone sets the color: this is blackbody radiation. A stove element glows red; hotter, it would turn orange, white, then blue. Stars follow the same rule. At 29,500 K, Alnitak is among the hottest stars visible, five times hotter than the Sun's surface." },
         { star: "Spica", head: "B \u00b7 25,300 K", text: "Heat sets how much light a surface gives off, and steeply: it rises with temperature to the fourth power, so twice as hot means 16 times the light. Area for area, Spica's surface outshines the Sun's 370 times over. Most of that is ultraviolet, which our eyes cannot see." },
@@ -4663,25 +4735,19 @@
     { name: "Alnair",    ra: 332.06,  dec: -46.96,  mag: 1.74, bv: -0.13, target: false, con: "Grus", dist: 101, type: "B6 V",   mass: 3.8 },
     { name: "Atria",     ra: 252.166, dec: -69.028, mag: 1.92, bv: 1.008, target: false, con: "Triangulum Australe", dist: 391, type: "K2 Ib",  mass: 6.4 },
     { name: "Peacock",   ra: 306.412, dec: -56.735, mag: 1.94, bv: -0.24, target: false, con: "Pavo", dist: 179, type: "B3 V",   mass: 5.9 },
-    { name: "Alsephina", ra: 131.176, dec: -54.708, mag: 1.96, bv: 0.03,  target: false, con: "Vela", dist: 81,  type: "A1 V",   mass: 2.4 },
     { name: "Alphard",   ra: 141.897, dec: -8.659,  mag: 1.98, bv: 1.067, target: false, con: "Hydra", dist: 177, type: "K3 III", mass: 3.2 },
     { name: "Diphda",    ra: 10.90,   dec: -17.99,  mag: 2.04, bv: 1.02,  target: false, con: "Cetus", dist: 96,  type: "K0 III", mass: 3.5 },
     // 10-10: every catalogue star of magnitude 3.0 or brighter now has a name and constellation (35 added,
     // identified by position), plus three fainter ones worth a note (tau Ceti, epsilon Eridani, Mira).
     // Seven carry type, distance, mass and a notable (facts from each star's Wikipedia article, read 10-10).
-    { name: "Suhail", ra: 136.999, dec: -43.432, mag: 2.21, bv: 1.156, target: false, con: "Vela", dist: 573, type: "K4 Ib" },
     { name: "α Lupi", ra: 220.482, dec: -47.388, mag: 2.3, bv: -0.255, target: false, con: "Lupus", dist: 548, type: "B1.5 III" },
-    { name: "Markeb", ra: 140.528, dec: -55.011, mag: 2.5, bv: -0.24, target: false, con: "Vela", dist: 539, type: "B2 IV" },
-    { name: "Zubeneschamali", ra: 229.252, dec: -9.383, mag: 2.61, bv: -0.06, target: false, con: "Libra", dist: 185, type: "B8 V", mass: 3.5, notable: "Earlier observers often called it the only green star visible to the naked eye. Modern observers see white or pale blue, as its 11,900 K surface should look, and there is no accepted explanation for the green reports. By the physics of glowing bodies, no star can look green." },
     { name: "Phact", ra: 84.912, dec: -34.074, mag: 2.64, bv: -0.09, target: false, con: "Columba", dist: 268, type: "B7 IV" },
     { name: "Unukalhai", ra: 236.067, dec: 6.426, mag: 2.65, bv: 1.008, target: false, con: "Serpens", dist: 73, type: "K2 III" },
     { name: "β Lupi", ra: 224.633, dec: -43.134, mag: 2.68, bv: -0.24, target: false, con: "Lupus", dist: 523, type: "B2 III" },
-    { name: "μ Velorum", ra: 161.692, dec: -49.420, mag: 2.69, bv: 0.775, target: false, con: "Vela", dist: 116, type: "G5 III" },
     { name: "α Muscae", ra: 189.296, dec: -69.136, mag: 2.69, bv: -0.24, target: false, con: "Musca", dist: 306, type: "B2 IV" },
     { name: "Lesath", ra: 262.691, dec: -37.296, mag: 2.69, bv: -0.24, target: false, con: "Scorpius", dist: 518, type: "B2 IV" },
     { name: "π Puppis", ra: 109.286, dec: -37.098, mag: 2.7, bv: 1.067, target: false, con: "Puppis", dist: 1094, type: "K3 Ib" },
     { name: "Yed Prior", ra: 243.586, dec: -3.694, mag: 2.74, bv: 1.5, target: false, con: "Ophiuchus", dist: 170, type: "M1 III" },
-    { name: "Zubenelgenubi", ra: 222.720, dec: -16.042, mag: 2.75, bv: 0.09, target: false, con: "Libra", dist: 77, type: "A3 IV" },
     { name: "γ Lupi", ra: 233.785, dec: -41.167, mag: 2.78, bv: -0.24, target: false, con: "Lupus", dist: 567, type: "B2 IV" },
     { name: "Cursa", ra: 76.963, dec: -5.086, mag: 2.79, bv: 0.09, target: false, con: "Eridanus", dist: 89, type: "A3 III" },
     { name: "β Hydri", ra: 6.438, dec: -77.254, mag: 2.8, bv: 0.626, target: false, con: "Hydrus", dist: 24, type: "G2 IV", mass: 1.1, notable: "A slightly heavier Sun, about 7 billion years old. Its core hydrogen is running out and it has begun to swell, to 1.8 times the Sun's width: a look at the Sun's own future. It is the nearest easily seen star to the south celestial pole, 13\u00b0 away." },
@@ -4697,7 +4763,7 @@
     { name: "τ Puppis", ra: 102.484, dec: -50.615, mag: 2.93, bv: 0.949, target: false, con: "Puppis", dist: 183, type: "K0 III" },
     { name: "Zaurak", ra: 59.508, dec: -13.509, mag: 2.95, bv: 1.5, target: false, con: "Eridanus", dist: 192, type: "M1 III" },
     { name: "α Arae", ra: 262.960, dec: -49.876, mag: 2.95, bv: -0.24, target: false, con: "Ara", dist: 242, type: "B2 V" },
-    { name: "Almaaz", ra: 75.492, dec: 43.823, mag: 2.99, bv: 0.3, target: false, con: "Auriga", type: "F0 Ia", notable: "Every 27 years it fades to less than half its brightness for nearly 2 years, one of the longest eclipses known. The cause is a companion star wrapped in a huge dark disk of dust that slides across it. The last eclipse ended in 2011; the next begins about 2036." },
+    { name: "Almaaz", ra: 75.492, dec: 43.823, mag: 2.99, bv: 0.3, target: false, con: "Auriga", dist: 3000, type: "F0 Ia", notable: "Every 27 years it fades to less than half its brightness for nearly 2 years, one of the longest eclipses known. The cause is a companion star wrapped in a huge dark disk of dust that slides across it. The last eclipse ended in 2011; the next begins about 2036." },
     { name: "β Trianguli", ra: 32.386, dec: 34.987, mag: 3, bv: 0.15, target: false, con: "Triangulum", dist: 124, type: "A5 III" },
     { name: "γ Hydrae", ra: 199.730, dec: -23.172, mag: 3, bv: 0.844, target: false, con: "Hydra", dist: 132, type: "G8 III" },
     { name: "τ Ceti", ra: 26.017, dec: -15.938, mag: 3.5, bv: 0.764, target: false, con: "Cetus", dist: 12, type: "G8 V", mass: 0.8, notable: "The nearest single Sun-like star, and an old one at about 9 billion years. Several planets have been claimed here and later withdrawn; none is confirmed. It is circled by ten times as much comet and asteroid debris as the Solar System." },
@@ -6911,7 +6977,17 @@
     }
     if (instant) setTimeout(() => { canvas.classList.remove('nofade'); twinkleCanvas.classList.remove('nofade'); }, 30);
   }
+  // The color code's letter strip: O B A F G K M, each in the color of its type, the current stop's
+  // letter underlined (user, 10-10). A low info panel sits above it.
+  const tourStrip = document.getElementById('tourStrip'), tourStripLetters = document.getElementById('tourStripLetters');
+  const STRIP_BV = { O: -0.30, B: -0.17, A: 0.05, F: 0.40, G: 0.65, K: 1.10, M: 1.60 };
+  Object.keys(STRIP_BV).forEach(L => { const s = document.createElement('span'); s.textContent = L; s.dataset.l = L;
+    s.style.color = `rgb(${colorForBV(STRIP_BV[L], 0.2)})`; tourStripLetters.appendChild(s); });
   function paintTourUI() {
+    const strip = !!(tour && tour.def.strip);
+    tourStrip.hidden = !strip;
+    infoPanel.classList.toggle('over-strip', strip);
+    if (strip) { const L = (tour.def.stops[tour.pos].head || '').charAt(0); tourStripLetters.querySelectorAll('span').forEach(s => s.classList.toggle('on', s.dataset.l === L)); }
     tourBtn.hidden = !tour;
     tourPrevBtn.hidden = !tour || tour.pos === 0;     // nothing before the first stop
     if (tour) tourBtn.textContent = tour.pos + 1 < tour.def.stops.length ? 'next' : 'done';
@@ -7010,7 +7086,8 @@
       const S = planeScale();
       turnCam(cam.f.slice(), unproject(W / 2 + (x0 + x1) / 2 * S, H / 2 - (y0 + y1) / 2 * S));
     }
-    const S = Math.min(TOUR_FILL * W / mx, TOUR_FILL * H / my);
+    const fill = t.def.fill || TOUR_FILL;      // a tour can frame its figures a little smaller
+    const S = Math.min(fill * W / mx, fill * H / my);
     const endFov = Math.max(ARRIVE_MIN_FOV[c.id] || ARRIVE_MIN_FOV_DEFAULT, Math.min(FOV_MAX, 4 * Math.atan((H / 2) / (2 * S)) / D2R));
     FOV_H = endFov;
     const sp = projectVec(star.v);
